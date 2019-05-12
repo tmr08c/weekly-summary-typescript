@@ -1,9 +1,10 @@
-import { hello } from "./index";
+import { fetchRecentlyClosedPullRequests } from "./index";
 
-test("basic", () => {
-  expect(0).toBe(0);
-});
+test("gives recently closed issues for public repositories", () => {
+  const recentlyClosedPullRequests = fetchRecentlyClosedPullRequests({
+    organization: "microsoft",
+    repository: "typescript"
+  });
 
-test("hello says hello", () => {
-  expect(hello()).toMatch(new RegExp("hello", "i"));
+  expect(recentlyClosedPullRequests.length).toBeGreaterThan(1);
 });
