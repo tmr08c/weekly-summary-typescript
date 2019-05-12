@@ -1,0 +1,25 @@
+{
+  "name": "weekly-summary-typescript",
+  "version": "0.0.1",
+  "description": "A module used to interact with the GitHub API to fetch recently closed Pull Requests.A module used to interact with the GitHub API to fetch recently closed",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tmr08c/weekly-summary-typescript.git"
+  },
+  "keywords": [
+    "github",
+    "typescript",
+    "github-api",
+    "pull-requests"
+  ],
+  "author": "Troy Rosenberg <tmr08c@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tmr08c/weekly-summary-typescript/issues"
+  },
+  "homepage": "https://github.com/tmr08c/weekly-summary-typescript#readme"
+}
