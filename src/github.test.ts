@@ -1,10 +1,10 @@
 import { recentlyClosedPullRequests } from "./github";
 
-test("fetching from a public repo", () => {
-  const recentPRs = recentlyClosedPullRequests({
-    organization: "microsoft",
-    repository: "typescript"
+test("fetching from a busy, public organization", async () => {
+  const response = await recentlyClosedPullRequests({
+    organization: "microsoft"
   });
 
-  expect(recentPRs.length).toBeGreaterThanOrEqual(1)
+  expect(response.search.edges.length).toBeGreaterThanOrEqual(1);
 });
+

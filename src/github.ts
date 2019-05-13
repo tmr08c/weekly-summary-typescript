@@ -2,40 +2,60 @@
 
 const graphql = require("@octokit/graphql");
 
-export async function recentlyClosedPullRequests({
-  organization,
-  repository
-}: WeeklySummary.RequestParams) {
-  console.log(process.env.GITHUB_AUTH_TOKEN);
+interface SearchResponse {
+  search: {
+    edges: [{ node: Response }];
+  };
+}
 
-  const response = await graphql(
-    `
-      {
-        repository(owner: "octokit", name: "graphql.js") {
-          issues(last: 3) {
-            edges {
-              node {
-                title
-              }
+interface Response {
+  repository: { name: string };
+  title: string;
+  createdAt: Date;
+  closedAt: Date;
+  url: string;
+  merged: boolean;
+}
+
+const closedPullRequestsQuery = `
+  query recentPullRequests($searchString: String!) {
+    search(
+      query: $searchString
+      type: ISSUE
+      first: 100
+    ) {
+      edges {
+        node {
+          ... on PullRequest {
+            repository {
+              name
             }
+            title
+            createdAt
+            closedAt
+            url
+            merged
           }
         }
       }
-    `,
-    {
-      headers: {
-        authorization: `token ${process.env.GITHUB_AUTH_TOKEN}`
-      }
     }
-  ).catch((e: Error) => {
+ }
+`;
+
+export async function recentlyClosedPullRequests({
+  organization
+}: WeeklySummary.RequestParams): Promise<SearchResponse> {
+  return await graphql({
+    query: closedPullRequestsQuery,
+    searchString: searchQueryString({ organization }),
+    headers: {
+      authorization: `token ${process.env.GITHUB_AUTH_TOKEN}`
+    }
+  }).catch((e: Error) => {
     console.error(`Failed to make request to GitHub. Received: ${e.message}`);
   });
-
-  return response;
 }
 
-recentlyClosedPullRequests({ organization: "", repository: "" }).then(
-  response => {
-    console.log(response);
-  }
-);
+function searchQueryString({ organization }: { organization: string }) {
+  return `org:${organization} is:pr is:closed created:>2019-04-01`;
+}

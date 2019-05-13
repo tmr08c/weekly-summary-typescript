@@ -6,6 +6,5 @@
 declare namespace WeeklySummary {
   export interface RequestParams {
     organization: string;
-    repository: string;
   }
 }
