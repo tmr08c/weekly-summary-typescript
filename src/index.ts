@@ -1,9 +1,25 @@
-/// <reference path="index.d.ts" />
+import { GitHub } from "./github";
+import { subDays } from "date-fns";
 
-import { recentlyClosedPullRequests } from "./github";
+interface RequestParams {
+  organization: string;
+}
 
 export function fetchRecentlyClosedPullRequests(
-  requestParams: WeeklySummary.RequestParams
+  requestParams: RequestParams,
+  service = GitHub
 ) {
-  return recentlyClosedPullRequests(requestParams);
+  const dates = {
+    startDate: subDays(new Date(), 7),
+    endDate: subDays(new Date(), 1)
+  };
+  const args = { ...dates, ...requestParams };
+
+  console.debug(
+    `Fetching pull requests for ${
+      requestParams.organization
+    } that were closed between ${dates.startDate} and ${dates.endDate}`
+  );
+
+  return service.recentlyClosedPullRequests(args);
 }
