@@ -53,6 +53,7 @@ export async function recentlyClosedPullRequests({
     }
   }).catch((e: Error) => {
     console.error(`Failed to make request to GitHub. Received: ${e.message}`);
+    throw e;
   });
 }
 
