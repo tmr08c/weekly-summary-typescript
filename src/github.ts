@@ -26,6 +26,7 @@ const closedPullRequestsQuery = `
     }
  }
 `;
+
 interface RequestParams {
   organization: string;
   startDate: Date;
