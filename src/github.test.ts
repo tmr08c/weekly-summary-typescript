@@ -1,4 +1,5 @@
 import { GitHub } from "./github";
+import fetchMock from "fetch-mock";
 
 test("fetching from a busy, public organization", async () => {
   const response = await GitHub.recentlyClosedPullRequests({
@@ -28,4 +29,21 @@ test("searching for the right date range", () => {
   });
 
   expect(searchString).toMatch("closed:2019-01-01..2019-01-07");
+});
+
+test("responses are formatted to be groups by repo, and 'cleaned up'", async () => {
+  const fetch = fetchMock
+    .sandbox()
+    .post("https://api.github.com/graphql", (url: string, options: object) => {
+      return { data: {} };
+    });
+
+  const resp = await GitHub.recentlyClosedPullRequests({
+    organization: "my-org",
+    startDate: new Date(),
+    endDate: new Date(),
+    request: { fetch }
+  });
+
+  expect(resp).toEqual({});
 });

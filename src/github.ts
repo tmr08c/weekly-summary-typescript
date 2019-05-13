@@ -31,6 +31,7 @@ interface RequestParams {
   organization: string;
   startDate: Date;
   endDate: Date;
+  request?: { fetch: Function };
 }
 
 interface SearchResponse {
@@ -48,17 +49,31 @@ interface Response {
   merged: boolean;
 }
 
+interface GitHubGraphqlArgs {
+  query: string;
+  searchString: string;
+  headers: {
+    authorization: string;
+  };
+  request?: { fetch: Function };
+}
+
 export class GitHub {
   static async recentlyClosedPullRequests(
     params: RequestParams
   ): Promise<SearchResponse> {
-    return await graphql({
+    let requestArgs: GitHubGraphqlArgs = {
       query: closedPullRequestsQuery,
       searchString: this.searchQueryString(params),
       headers: {
         authorization: `token ${process.env.GITHUB_AUTH_TOKEN}`
       }
-    }).catch((e: Error) => {
+    };
+
+    if (params.request) {
+      requestArgs = { ...requestArgs, request: params.request };
+    }
+    return await graphql(requestArgs).catch((e: Error) => {
       console.error(`Failed to make request to GitHub. Received: ${e.message}`);
       throw e;
     });
