@@ -57,5 +57,5 @@ export async function recentlyClosedPullRequests({
 }
 
 function searchQueryString({ organization }: { organization: string }) {
-  return `org:${organization} is:pr is:closed created:>2019-04-01`;
+  return `org:${organization} is:pr is:closed is:merged closed:>2019-04-01`;
 }
