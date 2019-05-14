@@ -6,7 +6,7 @@ afterEach(() => MockDate.reset());
 
 class FakeService {
   static async recentlyClosedPullRequests(): Promise<any> {}
-  static searchQueryString(): any {}
+  static __searchQueryString(): any {}
 }
 
 const fakeApiCall = (FakeService.recentlyClosedPullRequests = jest.fn());

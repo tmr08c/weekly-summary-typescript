@@ -64,7 +64,7 @@ export class GitHub {
   ): Promise<SearchResponse> {
     let requestArgs: GitHubGraphqlArgs = {
       query: closedPullRequestsQuery,
-      searchString: this.searchQueryString(params),
+      searchString: this.__searchQueryString(params),
       headers: {
         authorization: `token ${process.env.GITHUB_AUTH_TOKEN}`
       }
@@ -79,7 +79,7 @@ export class GitHub {
     });
   }
 
-  static searchQueryString({
+  static __searchQueryString({
     organization,
     startDate,
     endDate
