@@ -27,6 +27,19 @@ const closedPullRequestsQuery = `
  }
 `;
 
+interface PullRequestsForRepos {
+  [repo: string]: PullRequestInformation[];
+}
+
+interface PullRequestInformation {
+  repository: { name: string };
+  title: string;
+  createdAt: Date;
+  closedAt: Date;
+  url: string;
+  merged: boolean;
+}
+
 interface RequestParams {
   organization: string;
   startDate: Date;
@@ -34,19 +47,21 @@ interface RequestParams {
   request?: { fetch: Function };
 }
 
-interface SearchResponse {
+export interface SearchResponse {
   search: {
-    edges: [{ node: Response }];
+    edges: Response[];
   };
 }
 
-interface Response {
-  repository: { name: string };
-  title: string;
-  createdAt: Date;
-  closedAt: Date;
-  url: string;
-  merged: boolean;
+export interface Response {
+  node: {
+    repository: { name: string };
+    title: string;
+    createdAt: Date;
+    closedAt: Date;
+    url: string;
+    merged: boolean;
+  };
 }
 
 interface GitHubGraphqlArgs {
@@ -61,7 +76,7 @@ interface GitHubGraphqlArgs {
 export class GitHub {
   static async recentlyClosedPullRequests(
     params: RequestParams
-  ): Promise<SearchResponse> {
+  ): Promise<PullRequestsForRepos> {
     let requestArgs: GitHubGraphqlArgs = {
       query: closedPullRequestsQuery,
       searchString: this.__searchQueryString(params),
@@ -73,10 +88,32 @@ export class GitHub {
     if (params.request) {
       requestArgs = { ...requestArgs, request: params.request };
     }
-    return await graphql(requestArgs).catch((e: Error) => {
-      console.error(`Failed to make request to GitHub. Received: ${e.message}`);
-      throw e;
-    });
+
+    const response: SearchResponse = await graphql(requestArgs).catch(
+      (e: Error) => {
+        console.error(
+          `Failed to make request to GitHub. Received: ${e.message}`
+        );
+        throw e;
+      }
+    );
+
+    const pullRequestsGroupsByRepo: PullRequestsForRepos = {};
+
+    return response.search.edges.reduce(
+      (accumulator, pullRequestResponse, _currIndex, _arr) => {
+        const repoName = pullRequestResponse.node.repository.name;
+
+        if (!accumulator[repoName]) {
+          accumulator[repoName] = [];
+        }
+
+        accumulator[repoName].push(pullRequestResponse.node);
+
+        return accumulator;
+      },
+      pullRequestsGroupsByRepo
+    );
   }
 
   static __searchQueryString({
