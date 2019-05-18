@@ -81,24 +81,23 @@ jobs:
           at: ~/repo
 
       - run:
-          name: Test TypeScript code
-          command: npm test
+          name: Test TypeScript code and get coverage
+          command: npm run test:coverage
 
-      # TODO: Look into saving coverage with Jest
-      # - persist_to_workspace:
-      #     root: ~/repo
-      #     <<: *whitelist
+      - persist_to_workspace:
+          root: ~/repo
+          <<: *whitelist
 
-  # coveralls:
-  #   <<: *defaults
+  coveralls:
+    <<: *defaults
 
-  #   steps:
-  #     - attach_workspace:
-  #         at: ~/repo
+    steps:
+      - attach_workspace:
+          at: ~/repo
 
-  #     - run:
-  #         name: Submit coverage report to Coveralls.io
-  #         command: yarn coveralls
+      - run:
+          name: Submit coverage report to Coveralls.io
+          command: npm run coveralls
 
   build:
     <<: *defaults
@@ -145,9 +144,9 @@ workflows:
       # - lint:
       #     requires:
       #       - checkout
-      # - coveralls:
-      #     requires:
-      #       - test
+      - coveralls:
+          requires:
+            - test
       - build:
           requires:
             - test
