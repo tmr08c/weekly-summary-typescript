@@ -26,7 +26,7 @@ const closedPullRequestsQuery = `
  }
 `;
 
-interface IPullRequestsForRepos {
+export interface IPullRequestsForRepos {
   [repo: string]: IPullRequestInformation[];
 }
 

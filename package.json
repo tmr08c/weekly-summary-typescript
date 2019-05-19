@@ -1,12 +1,12 @@
 {
   "name": "weekly-summary-typescript",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A module used to interact with the GitHub API to fetch recently closed Pull Requests.A module used to interact with the GitHub API to fetch recently closed",
   "main": "dist/index.js",
-  "types": "src/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "build-watch": "tsc -w",
+    "build": "tsc --declaration",
+    "build:watch": "tsc --declaration -w",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
