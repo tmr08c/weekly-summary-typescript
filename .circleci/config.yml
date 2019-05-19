@@ -62,16 +62,16 @@ jobs:
           root: ~/repo
           <<: *whitelist
 
-  # lint:
-  #   <<: *defaults
+  lint:
+    <<: *defaults
 
-  #   steps:
-  #     - attach_workspace:
-  #         at: ~/repo
+    steps:
+      - attach_workspace:
+          at: ~/repo
 
-  #     - run:
-  #         name: Lint TypeScript code
-  #         command: yarn lint
+      - run:
+          name: Lint TypeScript code
+          command: npm run lint
 
   test:
     <<: *defaults
@@ -141,16 +141,16 @@ workflows:
       - test:
           requires:
             - checkout
-      # - lint:
-      #     requires:
-      #       - checkout
+      - lint:
+          requires:
+            - checkout
       - coveralls:
           requires:
             - test
       - build:
           requires:
             - test
-            # - lint
+            - lint
   # release:
   #   jobs:
   #     - checkout:
