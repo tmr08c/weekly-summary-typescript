@@ -102,23 +102,23 @@ jobs:
           root: ~/repo
           <<: *whitelist
 
-  # deploy:
-  #   <<: *defaults
-  #   steps:
-  #     - attach_workspace:
-  #         at: ~/repo
-  #     - run:
-  #         name: Write NPM Token to ~/.npmrc
-  #         command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-  #     - run:
-  #         name: Install dot-json package
-  #         command: npm install dot-json
-  #     - run:
-  #         name: Write version to package.json
-  #         command: $(yarn bin)/dot-json package.json version ${CIRCLE_TAG:1}
-  #     - run:
-  #         name: Publish to NPM
-  #         command: npm publish --access=public
+  deploy:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Write NPM Token to ~/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run:
+          name: Install dot-json package
+          command: npm install dot-json
+      - run:
+          name: Write version to package.json
+          command: $(yarn bin)/dot-json package.json version ${CIRCLE_TAG:1}
+      - run:
+          name: Publish to NPM
+          command: npm publish --access=public
 
 workflows:
   build:
@@ -137,52 +137,54 @@ workflows:
           requires:
             - test
             - lint
-  # release:
-  #   jobs:
-  #     - checkout:
-  #         filters:
-  #           tags:
-  #             only: /v[0-9]+(\.[0-9]+)*/
-  #           branches:
-  #             ignore: /.*/
-  #     - test:
-  #         filters:
-  #           tags:
-  #             only: /v[0-9]+(\.[0-9]+)*/
-  #           branches:
-  #             ignore: /.*/
-  #         requires:
-  #           - checkout
-  #     - lint:
-  #         filters:
-  #           tags:
-  #             only: /v[0-9]+(\.[0-9]+)*/
-  #           branches:
-  #             ignore: /.*/
-  #         requires:
-  #           - checkout
-  #     - coveralls:
-  #         filters:
-  #           tags:
-  #             only: /v[0-9]+(\.[0-9]+)*/
-  #           branches:
-  #             ignore: /.*/
-  #         requires:
-  #           - test
-  #     - build:
-  #         filters:
-  #           tags:
-  #             only: /v[0-9]+(\.[0-9]+)*/
-  #           branches:
-  #             ignore: /.*/
-  #         requires:
-  #           - test
-  #           - lint
-  #     - deploy:
-  #         filters:
-  #           tags:
-  #             only: /v[0-9]+(\.[0-9]+)*/
-  #           branches:
-  #             ignore: /.*/
-  #         requires:
-  #           - build
+
+  # release should only run on master and when commit it tagged with version
+  release:
+    jobs:
+      - checkout:
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              only: "master"
+      - test:
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              only: "master"
+          requires:
+            - checkout
+      - lint:
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              only: "master"
+          requires:
+            - checkout
+      - coveralls:
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              only: "master"
+          requires:
+            - test
+      - build:
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              only: "master"
+          requires:
+            - test
+            - lint
+      - deploy:
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              only: "master"
+          requires:
+            - build

@@ -13,7 +13,13 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "tslint src/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
+    "format": "prettier --write src/**/*.ts",
     "tslint-check": "tslint-config-prettier-check ./tslint.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm test && npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
