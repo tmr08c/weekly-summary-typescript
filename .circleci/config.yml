@@ -146,13 +146,13 @@ workflows:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              only: "master"
+              only: master
       - test:
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              only: "master"
+              only: master
           requires:
             - checkout
       - lint:
@@ -160,7 +160,7 @@ workflows:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              only: "master"
+              only: master
           requires:
             - checkout
       - coveralls:
@@ -168,7 +168,7 @@ workflows:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              only: "master"
+              only: master
           requires:
             - test
       - build:
@@ -176,7 +176,7 @@ workflows:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              only: "master"
+              only: master
           requires:
             - test
             - lint
@@ -185,6 +185,6 @@ workflows:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              only: "master"
+              only: master
           requires:
             - build
