@@ -1,19 +1,25 @@
 {
   "name": "weekly-summary-typescript",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A module used to interact with the GitHub API to fetch recently closed Pull Requests.A module used to interact with the GitHub API to fetch recently closed",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --declaration",
-    "build:watch": "tsc --declaration -w",
+    "build:watch": "npm run build -- -w",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test:watch": "npm test -- --watch",
+    "test:coverage": "npm test -- --coverage",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "tslint src/**/*.ts",
-    "lint:fix": "tslint --fix src/**/*.ts",
-    "tslint-check": "tslint-config-prettier-check ./tslint.json"
+    "lint:fix": "npm run lint -- --fix",
+    "format": "prettier --write src/**/*.ts",
+    "tslint-check": "tslint-config-prettier-check ./tslint.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm test && npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
