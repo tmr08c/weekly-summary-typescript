@@ -36,6 +36,7 @@ whitelist: &whitelist
     - tsconfig.json
     - tslint.json
     - jest.config.js
+    - types/*
 
 jobs:
   checkout:
