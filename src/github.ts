@@ -1,5 +1,4 @@
-const graphql = require("@octokit/graphql");
-
+import graphql from "@octokit/graphql";
 import { format } from "date-fns";
 
 const closedPullRequestsQuery = `
@@ -27,33 +26,33 @@ const closedPullRequestsQuery = `
  }
 `;
 
-interface PullRequestsForRepos {
-  [repo: string]: PullRequestInformation[];
+interface IPullRequestsForRepos {
+  [repo: string]: IPullRequestInformation[];
 }
 
-interface PullRequestInformation {
+interface IPullRequestInformation {
+  closedAt: Date;
+  createdAt: Date;
+  merged: boolean;
   repository: { name: string };
   title: string;
-  createdAt: Date;
-  closedAt: Date;
   url: string;
-  merged: boolean;
 }
 
-interface RequestParams {
+interface IRequestParams {
+  endDate: Date;
   organization: string;
   startDate: Date;
-  endDate: Date;
-  request?: { fetch: Function };
+  request?: { fetch: () => object };
 }
 
-export interface SearchResponse {
+export interface ISearchResponse {
   search: {
-    edges: Response[];
+    edges: IResponse[];
   };
 }
 
-export interface Response {
+export interface IResponse {
   node: {
     repository: { name: string };
     title: string;
@@ -64,32 +63,32 @@ export interface Response {
   };
 }
 
-interface GitHubGraphqlArgs {
-  query: string;
-  searchString: string;
+interface IGitHubGraphqlArgs {
   headers: {
     authorization: string;
   };
-  request?: { fetch: Function };
+  query: string;
+  request?: { fetch: () => object };
+  searchString: string;
 }
 
 export class GitHub {
-  static async recentlyClosedPullRequests(
-    params: RequestParams
-  ): Promise<PullRequestsForRepos> {
-    let requestArgs: GitHubGraphqlArgs = {
-      query: closedPullRequestsQuery,
-      searchString: this.__searchQueryString(params),
+  public static async recentlyClosedPullRequests(
+    params: IRequestParams
+  ): Promise<IPullRequestsForRepos> {
+    let requestArgs: IGitHubGraphqlArgs = {
       headers: {
         authorization: `token ${process.env.GITHUB_AUTH_TOKEN}`
-      }
+      },
+      query: closedPullRequestsQuery,
+      searchString: this.__searchQueryString(params)
     };
 
     if (params.request) {
       requestArgs = { ...requestArgs, request: params.request };
     }
 
-    const response: SearchResponse = await graphql(requestArgs).catch(
+    const response: ISearchResponse = await graphql(requestArgs).catch(
       (e: Error) => {
         console.error(
           `Failed to make request to GitHub. Received: ${e.message}`
@@ -98,29 +97,26 @@ export class GitHub {
       }
     );
 
-    const pullRequestsGroupsByRepo: PullRequestsForRepos = {};
+    const pullRequestsGroupsByRepo: IPullRequestsForRepos = {};
 
-    return response.search.edges.reduce(
-      (accumulator, pullRequestResponse, _currIndex, _arr) => {
-        const repoName = pullRequestResponse.node.repository.name;
+    return response.search.edges.reduce((accumulator, pullRequestResponse) => {
+      const repoName = pullRequestResponse.node.repository.name;
 
-        if (!accumulator[repoName]) {
-          accumulator[repoName] = [];
-        }
+      if (!accumulator[repoName]) {
+        accumulator[repoName] = [];
+      }
 
-        accumulator[repoName].push(pullRequestResponse.node);
+      accumulator[repoName].push(pullRequestResponse.node);
 
-        return accumulator;
-      },
-      pullRequestsGroupsByRepo
-    );
+      return accumulator;
+    }, pullRequestsGroupsByRepo);
   }
 
-  static __searchQueryString({
+  public static __searchQueryString({
     organization,
     startDate,
     endDate
-  }: RequestParams) {
+  }: IRequestParams) {
     const formattedStartDate = format(startDate, "YYYY-MM-DD");
     const formattedEndDate = format(endDate, "YYYY-MM-DD");
 

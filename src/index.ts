@@ -1,17 +1,17 @@
-import { GitHub } from "./github";
 import { subDays } from "date-fns";
+import { GitHub } from "./github";
 
-interface RequestParams {
+interface IRequestParams {
   organization: string;
 }
 
 export function fetchRecentlyClosedPullRequests(
-  requestParams: RequestParams,
+  requestParams: IRequestParams,
   service = GitHub
 ) {
   const dates = {
-    startDate: subDays(new Date(), 7),
-    endDate: subDays(new Date(), 1)
+    endDate: subDays(new Date(), 1),
+    startDate: subDays(new Date(), 7)
   };
   const args = { ...dates, ...requestParams };
 

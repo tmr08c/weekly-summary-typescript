@@ -1,25 +1,25 @@
-import { GitHub, Response, SearchResponse } from "./github";
 import fetchMock from "fetch-mock";
+import { GitHub, IResponse, ISearchResponse } from "./github";
 
 test("fetching from a busy, public organization", async () => {
   const response = await GitHub.recentlyClosedPullRequests({
+    endDate: new Date("5/7/19"),
     organization: "microsoft",
-    startDate: new Date("5/1/19"),
-    endDate: new Date("5/7/19")
+    startDate: new Date("5/1/19")
   });
 
   expect(Object.values(response).length).toBeGreaterThanOrEqual(1);
 });
 
-function createMockPullRequest(repoName: string, title: string): Response {
+function createMockPullRequest(repoName: string, title: string): IResponse {
   return {
     node: {
-      repository: { name: repoName },
-      title: title,
-      createdAt: new Date(),
       closedAt: new Date(),
-      url: `https://www.github.com/someOrg/${repoName}/pulls/1`,
-      merged: true
+      createdAt: new Date(),
+      merged: true,
+      repository: { name: repoName },
+      title,
+      url: `https://www.github.com/someOrg/${repoName}/pulls/1`
     }
   };
 }
@@ -29,7 +29,7 @@ test("responses are formatted to be groups by repo, and 'cleaned up'", async () 
   const repoTwoPullOne = createMockPullRequest("repo-2", "pull-request-1");
   const repoOnePullTwo = createMockPullRequest("repo-1", "pull-request-2");
 
-  const mockResponse: SearchResponse = {
+  const mockResponse: ISearchResponse = {
     search: {
       edges: [repoOnePullOne, repoTwoPullOne, repoOnePullTwo]
     }
@@ -42,10 +42,10 @@ test("responses are formatted to be groups by repo, and 'cleaned up'", async () 
     });
 
   const resp = await GitHub.recentlyClosedPullRequests({
-    organization: "my-org",
-    startDate: new Date(),
     endDate: new Date(),
-    request: { fetch }
+    organization: "my-org",
+    request: { fetch },
+    startDate: new Date()
   });
 
   // expecting something like
@@ -56,7 +56,7 @@ test("responses are formatted to be groups by repo, and 'cleaned up'", async () 
 });
 
 test("search string include the specified org and date range", async () => {
-  const emptyMockResponse: SearchResponse = {
+  const emptyMockResponse: ISearchResponse = {
     search: { edges: [] }
   };
   const fetch = fetchMock
@@ -75,10 +75,10 @@ test("search string include the specified org and date range", async () => {
     );
 
   const resp = await GitHub.recentlyClosedPullRequests({
-    organization: "my-org",
-    startDate: new Date("1/1/2019"),
     endDate: new Date("1/7/2019"),
-    request: { fetch }
+    organization: "my-org",
+    request: { fetch },
+    startDate: new Date("1/1/2019")
   });
 
   expect(resp).toEqual({});
