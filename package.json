@@ -9,7 +9,7 @@
     "build-watch": "tsc -w",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage --coverageReporters=text-lcov",
+    "test:coverage": "jest --coverage",
     "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
