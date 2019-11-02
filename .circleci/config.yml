@@ -138,7 +138,7 @@ workflows:
             - test
             - lint
 
-  # release should only run on master and when commit it tagged with version
+  # release should only run on master and when commit is tagged with version
   release:
     jobs:
       - checkout:
