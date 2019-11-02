@@ -1,8 +1,19 @@
 import fetchMock from "fetch-mock";
 import { GitHub, IResponse, ISearchResponse } from "./github";
 
+function createGitHub() {
+  const authToken = process.env.GITHUB_AUTH_TOKEN;
+  if (!authToken) {
+    throw new Error(
+      "Must set `GITHUB_AUTH_TOKEN` environmental variable for tests to run."
+    );
+  }
+
+  return new GitHub({ authToken });
+}
 test("fetching from a busy, public organization", async () => {
-  const response = await GitHub.recentlyClosedPullRequests({
+  const github = createGitHub();
+  const response = await github.recentlyClosedPullRequests({
     endDate: new Date("5/7/19"),
     organization: "microsoft",
     startDate: new Date("5/1/19")
@@ -41,7 +52,8 @@ test("responses are formatted to be groups by repo, and 'cleaned up'", async () 
       return { data: mockResponse };
     });
 
-  const resp = await GitHub.recentlyClosedPullRequests({
+  const github = createGitHub();
+  const resp = await github.recentlyClosedPullRequests({
     endDate: new Date(),
     organization: "my-org",
     request: { fetch },
@@ -74,7 +86,8 @@ test("search string include the specified org and date range", async () => {
       }
     );
 
-  const resp = await GitHub.recentlyClosedPullRequests({
+  const github = createGitHub();
+  const resp = await github.recentlyClosedPullRequests({
     endDate: new Date("1/7/2019"),
     organization: "my-org",
     request: { fetch },

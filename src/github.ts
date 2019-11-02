@@ -73,12 +73,18 @@ interface IGitHubGraphqlArgs {
 }
 
 export class GitHub {
-  public static async recentlyClosedPullRequests(
+  token: string;
+
+  constructor({ authToken }: { authToken: string }) {
+    this.token = authToken;
+  }
+
+  public async recentlyClosedPullRequests(
     params: IRequestParams
   ): Promise<IPullRequestsForRepos> {
     let requestArgs: IGitHubGraphqlArgs = {
       headers: {
-        authorization: `token ${process.env.GITHUB_AUTH_TOKEN}`
+        authorization: `token ${this.token}`
       },
       query: closedPullRequestsQuery,
       searchString: this.__searchQueryString(params)
@@ -112,7 +118,7 @@ export class GitHub {
     }, pullRequestsGroupsByRepo);
   }
 
-  public static __searchQueryString({
+  public __searchQueryString({
     organization,
     startDate,
     endDate
