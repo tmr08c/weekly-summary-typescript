@@ -105,20 +105,9 @@ jobs:
   deploy:
     <<: *defaults
     steps:
-      - attach_workspace:
-          at: ~/repo
-      - run:
-          name: Write NPM Token to ~/.npmrc
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run:
-          name: Install dot-json package
-          command: npm install dot-json
-      - run:
-          name: Write version to package.json
-          command: $(yarn bin)/dot-json package.json version ${CIRCLE_TAG:1}
-      - run:
-          name: Publish to NPM
-          command: npm publish --access=public
+      - checkout
+      - run: npm install
+      - run: npx semantic-release
 
 workflows:
   build:
@@ -138,53 +127,41 @@ workflows:
             - test
             - lint
 
-  # release should only run on master and when commit is tagged with version
+  # release should only run on master
   release:
     jobs:
       - checkout:
           filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              ignore: /.*/
+              only: master
       - test:
           filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              ignore: /.*/
+              only: master
           requires:
             - checkout
       - lint:
           filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              ignore: /.*/
+              only: master
           requires:
             - checkout
       - coveralls:
           filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              ignore: /.*/
+              only: master
           requires:
             - test
       - build:
           filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              ignore: /.*/
+              only: master
           requires:
             - test
             - lint
       - deploy:
           filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              ignore: /.*/
+              only: master
           requires:
             - build
