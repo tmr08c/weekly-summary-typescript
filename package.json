@@ -16,14 +16,11 @@
     "format": "prettier --write src/**/*.ts",
     "tslint-check": "tslint-config-prettier-check ./tslint.json",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
-    "preversion": "npm test && npm run lint",
-    "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tmr08c/weekly-summary-typescript.git"
+    "url": "https://github.com/tmr08c/weekly-summary-typescript.git"
   },
   "keywords": [
     "github",
@@ -48,6 +45,7 @@
     "jest": "^24.8.0",
     "mockdate": "^2.0.2",
     "prettier": "1.17.0",
+    "semantic-release": "^15.13.29",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.1.0",
     "tslint": "^5.16.0",
