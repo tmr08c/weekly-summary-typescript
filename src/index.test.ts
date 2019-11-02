@@ -4,21 +4,24 @@ import { fetchRecentlyClosedPullRequests } from "./index";
 // Reset Date back to the real date
 afterEach(() => MockDate.reset());
 
-class FakeService {
-  public static async recentlyClosedPullRequests(): Promise<any> {
-    return {};
-  }
-  public static __searchQueryString(): string {
-    return "";
-  }
-}
-
-const fakeApiCall = (FakeService.recentlyClosedPullRequests = jest.fn());
-
 test("dates default to the last week", () => {
   MockDate.set("1/8/2019");
 
-  fetchRecentlyClosedPullRequests({ organization: "my-org" }, FakeService);
+  jest.mock("./github");
+  const MockedGitHub = require("./github").GitHub;
+
+  const fakeApiCall = jest.fn().mockImplementation();
+  MockedGitHub.mockImplementation(() => {
+    return {
+      recentlyClosedPullRequests: fakeApiCall
+    };
+  });
+
+  fetchRecentlyClosedPullRequests(
+    { organization: "my-org" },
+    "fake-token",
+    MockedGitHub
+  );
 
   expect(fakeApiCall).toHaveBeenCalledWith({
     endDate: new Date("1/7/2019"),

@@ -73,7 +73,7 @@ interface IGitHubGraphqlArgs {
 }
 
 export class GitHub {
-  token: string;
+  private token: string;
 
   constructor({ authToken }: { authToken: string }) {
     this.token = authToken;
