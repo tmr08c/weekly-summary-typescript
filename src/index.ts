@@ -7,7 +7,8 @@ interface IRequestParams {
 
 export function fetchRecentlyClosedPullRequests(
   requestParams: IRequestParams,
-  service = GitHub
+  authToken: string,
+  Service = GitHub
 ) {
   const dates = {
     endDate: subDays(new Date(), 1),
@@ -21,5 +22,5 @@ export function fetchRecentlyClosedPullRequests(
     } that were closed between ${dates.startDate} and ${dates.endDate}`
   );
 
-  return service.recentlyClosedPullRequests(args);
+  return new Service({ authToken }).recentlyClosedPullRequests(args);
 }
